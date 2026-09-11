@@ -1,0 +1,28 @@
+#cloud-config                         # Defines this file as a cloud-init cloud-config file.
+
+hostname: ubuntu-server-01            # Sets the VM hostname to ubuntu-server-01.
+
+network:                               # Configures the VM network.
+  version: 2                           # Uses network configuration version 2.
+  ethernets:                           # Defines Ethernet interface settings.
+    primary:                           # Names this network configuration "primary".
+      match:                           # Selects the network interface to configure.
+        name: "en*"                    # Matches Ethernet interfaces starting with "en".
+      dhcp4: true                      # Enables IPv4 DHCP(local) to automatically obtain an IP address.
+
+users:                                 # Defines users to create or configure.
+  - name: ubuntu                       # Creates/configures the ubuntu user.
+    groups:                            # Defines the user's groups.
+      - sudo                           # Adds ubuntu to the sudo group.
+    shell: /bin/bash                   # Sets Bash as the user's default shell.
+    sudo: ALL=(ALL) NOPASSWD:ALL      # Gives ubuntu full sudo access without a password.
+    lock_passwd: true                  # Disables password-based login for the ubuntu user.
+    ssh_authorized_keys:               # Defines SSH public keys allowed to log in.
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOGFSPGsxRFiexvroYiu9Vw3y/00s00LlgMcH/rbF+Qa marwen@laptop # Adds the SSH public key for key-based login.
+
+ssh_pwauth: false                      # Disables SSH password authentication.
+package_update: true                   # Runs apt update to refresh the package index.
+packages:                              # Lists packages to install automatically.
+  - qemu-guest-agent                   # Installs the QEMU Guest Agent for libvirt/KVM integration.
+runcmd:                                # Defines commands to run after initial configuration.
+  - systemctl enable --now qemu-guest-agent  # Starts the agent now and enables it at boot.
